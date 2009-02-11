@@ -105,6 +105,8 @@ module Mocha # :nodoc:
     #   # => verify succeeds
     def never
       @cardinality = Cardinality.exactly(0)
+      @mock.expectations.to_a.delete_if{ |e| e.match?(@method_matcher.expected_method_name) and not e == self} if 
+        @mock.expectations.matches_method?(@method_matcher.expected_method_name)
       self
     end
   

@@ -173,6 +173,18 @@ class ExpectedInvocationCountTest < Test::Unit::TestCase
     assert_passed(test_result)
   end
   
+  
+  def test_should_fail_fast_if_method_is_never_expected_but_is_called_once_even_after_it_has_been_stubbed
+    test_result = run_as_test do
+      o = mock('stub')
+      o.stubs(:method)
+      o.expects(:method).never
+      1.times { o.method }
+    end
+    assert_failed(test_result)
+    assert_equal ["unexpected invocation: #<Mock:stub>.method()\nsatisfied expectations:\n- expected never, not yet invoked: #<Mock:stub>.method(any_parameters)\n"], test_result.failure_messages
+  end
+  
   def test_should_fail_fast_if_method_is_never_expected_but_is_called_once_even_if_everything_is_stubbed
     test_result = run_as_test do
       stub = stub_everything('stub')
